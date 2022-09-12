@@ -1,0 +1,17 @@
+main::before {
+    position: fixed;
+    height: 20px;
+    width: 50px;
+    background-color: red !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    content: 'mymodule';
+    font-size: .5rem;
+    z-index: 1000;
+}
+
+div#mymodule_block_home p {
+    font-size: 150%;
+    font-style:italic;
+}

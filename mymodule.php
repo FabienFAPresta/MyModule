@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -31,9 +32,8 @@ if (!defined('_PS_VERSION_')) {
 class MyModule extends Module
 {
     public const AVAILABLE_HOOKS = [
-        'header',
-        'footer',
-        'displayLeftColumn'
+        'actionFrontControllerSetMedia',
+        'displayBanner'
     ];
 
     public function __construct()
@@ -64,10 +64,9 @@ class MyModule extends Module
      */
     public function install(): bool
     {
-        return (
-            parent::install()
+        return (parent::install()
             && $this->registerHook(self::AVAILABLE_HOOKS)
-            && Configuration::updateValue('MYMODULE_TEST', 'Test')
+            && Configuration::updateValue('MYMODULE_NAME', 'my friend')
         );
     }
 
@@ -78,9 +77,8 @@ class MyModule extends Module
      */
     public function uninstall(): bool
     {
-        return (
-            parent::uninstall()
-            && Configuration::deleteByName('MYMODULE_TEST')
+        return (parent::uninstall()
+            && Configuration::deleteByName('MYMODULE_NAME')
         );
     }
 
@@ -139,7 +137,7 @@ class MyModule extends Module
     {
         $output = '';
 
-         // this part is executed only when the form is submitted
+        // this part is executed only when the form is submitted
         if (Tools::isSubmit('submit' . $this->name)) {
             // retrieve the value set by the user
             $configValue = (string) Tools::getValue('MYMODULE_TEST');
@@ -156,5 +154,43 @@ class MyModule extends Module
         }
 
         return $output . $this->displayConfigurationForm();
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param [type] $params
+     * @return void
+     */
+    public function hookDisplayBanner($params)
+    {
+        $this->context->smarty->assign([
+            'my_module_name' => Configuration::get('MYMODULE_NAME'),
+            'my_module_link' => $this->context->link->getModuleLink('mymodule', 'display'),
+            'my_module_message' => $this->l('This is a simple text message')
+        ]);
+
+        return $this->display(__FILE__, 'mymodule.tpl');
+    }
+
+    public function hookActionFrontControllerSetMedia()
+    {
+        $res = $this->context->controller->registerStylesheet(
+            'mymodule-style',
+            'modules/' . $this->name . '/views/css/mymodule.css',
+            [
+                'media' => 'all',
+                'priority' => 1000,
+            ]
+        );
+
+        $this->context->controller->registerJavascript(
+            'mymodule-javascript',
+            'modules/' . $this->name . '/views/js/mymodule.js',
+            [
+                'position' => 'bottom',
+                'priority' => 1000,
+            ]
+        );
     }
 }
