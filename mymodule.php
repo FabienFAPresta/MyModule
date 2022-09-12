@@ -33,14 +33,15 @@ class MyModule extends Module
 {
     public const AVAILABLE_HOOKS = [
         'actionFrontControllerSetMedia',
-        'displayBanner'
+        'displayBanner',
+        'displayDashboardToolbarIcons'
     ];
 
     public function __construct()
     {
         $this->name = 'mymodule';
         $this->tab = 'front_office_features';
-        $this->version = '1.0.0';
+        $this->version = '1.0.1';
         $this->author = 'Fabien Fernandes Alves';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = [
@@ -51,8 +52,8 @@ class MyModule extends Module
 
         parent::__construct();
 
-        $this->displayName = $this->l('My Module');
-        $this->description = $this->l('Description of My Module');
+        $this->displayName = $this->trans('My Module');
+        $this->description = $this->trans('Description of My Module');
 
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
     }
@@ -156,13 +157,7 @@ class MyModule extends Module
         return $output . $this->displayConfigurationForm();
     }
 
-    /**
-     * Undocumented function
-     *
-     * @param [type] $params
-     * @return void
-     */
-    public function hookDisplayBanner($params)
+    public function hookDisplayBanner(array $params)
     {
         $this->context->smarty->assign([
             'my_module_name' => Configuration::get('MYMODULE_NAME'),
@@ -192,5 +187,21 @@ class MyModule extends Module
                 'priority' => 1000,
             ]
         );
+    }
+
+    /**
+     * Add an "XML export" to the product list
+     *
+     * @param  array        $hookParams         Hook parameters
+     * @return bool
+     */
+    public function hookDisplayDashboardToolbarIcons(array $hookParams): bool
+    {
+        if ($this->isSymfonyContext() && $hookParams['route'] === 'admin_product_catalog') {
+            $products = $this->get('product_repository')->findAllByLangId(1);
+            dump($products);
+        }
+
+        return true;
     }
 }

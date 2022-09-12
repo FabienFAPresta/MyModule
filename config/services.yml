@@ -1,0 +1,4 @@
+services:
+  product_repository:
+    class: MyModule\Repository\ProductRepository
+    arguments: ["@doctrine.dbal.default_connection", "%database_prefix%"]
