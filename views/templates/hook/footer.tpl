@@ -1,0 +1,1 @@
+<h1>{$footer_sentence}</h1>
