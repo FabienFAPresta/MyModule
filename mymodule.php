@@ -41,7 +41,8 @@ class MyModule extends Module implements WidgetInterface
         'actionFrontControllerSetMedia',
         'displayBanner',
         'displayFooter',
-        'displayDashboardToolbarIcons'
+        'displayDashboardToolbarIcons',
+        'moduleRoutes'
     ];
 
     private $container;
@@ -145,6 +146,10 @@ class MyModule extends Module implements WidgetInterface
      */
     public function getContent(): string
     {
+        /* 
+         * First method using the helper
+         */
+
         $output = '';
 
         // this part is executed only when the form is submitted
@@ -164,13 +169,31 @@ class MyModule extends Module implements WidgetInterface
         }
 
         return $output . $this->displayConfigurationForm();
+
+        /* 
+         * Second method using the tpl
+         */
+        // $message = null;
+
+        // if (Tools::getValue('courserating')) {
+        //     Configuration::updateValue('COURSE_RATING', Tools::getValue('courserating'));
+        //     $message = $this->trans("Form saved correctly");
+        // }
+
+        // $courserating = Configuration::get('COURSE_RATING');
+        // $this->context->smarty->assign([
+        //     'courserating' => $courserating,
+        //     'message' => $message
+        // ]);
+
+        // return $this->fetch('module:' . $this->name . '/views/templates/admin/configuration.tpl');
     }
 
     public function hookDisplayBanner(array $params)
     {
         $this->context->smarty->assign([
             'my_module_name' => Configuration::get('MYMODULE_NAME'),
-            'my_module_link' => $this->context->link->getModuleLink('mymodule', 'display'),
+            'my_module_link' => $this->context->link->getModuleLink($this->name, 'display'),
             'my_module_message' => $this->l('This is a simple text message')
         ]);
 
@@ -242,5 +265,21 @@ class MyModule extends Module implements WidgetInterface
         $this->context->smarty->assign($this->getWidgetVariables($hookName, $configuration));
 
         return $this->display(__FILE__, 'basic.tpl');
+    }
+
+    public function hookModuleRoutes(array $params): array
+    {
+        return [
+            'display' => [
+                'controller' => 'display',
+                'rule' => 'mymodule-display',
+                'keywords' => [],
+                'params' => [
+                    'module' => $this->name,
+                    'fc' => 'module',
+                    'controller' => 'display'
+                ]
+            ]
+        ];
     }
 }
