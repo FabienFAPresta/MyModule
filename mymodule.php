@@ -26,6 +26,7 @@
  */
 
 use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
+use PrestaShop\PrestaShop\Core\Module\WidgetInterface;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -34,7 +35,7 @@ if (!defined('_PS_VERSION_')) {
 require_once __DIR__ . '/src/TestService.php';
 //require_once __DIR__ . '/src/Repository/ProductRepository.php';
 
-class MyModule extends Module
+class MyModule extends Module implements WidgetInterface
 {
     public const AVAILABLE_HOOKS = [
         'actionFrontControllerSetMedia',
@@ -227,5 +228,19 @@ class MyModule extends Module
         ]);
 
         return $this->display(__FILE__, 'footer.tpl');
+    }
+
+    public function getWidgetVariables($hookName, array $configuration = []): array
+    {
+        return [
+            'myparamtest' => 'Prestashop developer'
+        ];
+    }
+
+    public function renderWidget($hookName = '', array $configuration = []): string
+    {
+        $this->context->smarty->assign($this->getWidgetVariables($hookName, $configuration));
+
+        return $this->display(__FILE__, 'basic.tpl');
     }
 }
