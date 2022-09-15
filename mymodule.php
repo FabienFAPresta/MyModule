@@ -27,6 +27,7 @@
 
 use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
 use PrestaShop\PrestaShop\Core\Module\WidgetInterface;
+use PrestaShopBundle\Entity\Repository\TabRepository;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -68,6 +69,42 @@ class MyModule extends Module implements WidgetInterface
         $this->confirmUninstall = $this->trans('Are you sure you want to uninstall?');
     }
 
+    private function installSql(): bool
+    {
+        $sql = "CREATE TABLE IF NOT EXISTS `" . _DB_PREFIX_ . "testcomment` (
+            `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+            `user_id` varchar(255) DEFAULT NULL,
+            `comment` varchar(255) DEFAULT NULL,
+            PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
+
+        return Db::getInstance()->execute($sql);
+    }
+
+    public function installTab(): bool
+    {
+        $tab = new Tab();
+        $tab->class_name = 'AdminTest';
+        $tab->module = $this->name;
+        $tabRepository = $this->get('prestashop.core.admin.tab.repository');
+        $tab->id_parent = $tabRepository->findOneIdByClassName('DEFAULT');
+        $tab->icon = 'settings_applications';
+        $languages = Language::getLanguages();
+        foreach ($languages as $language) {
+            $tab->name[$language['id_lang']] = $this->trans('Test admin controller');
+        }
+
+        try {
+            $tab->save();
+        } catch (Exception $e) {
+            echo $e->getMessage();
+            return false;
+        }
+
+        return true;
+    }
+
+
     /**
      * Install and activate the module
      *
@@ -78,7 +115,33 @@ class MyModule extends Module implements WidgetInterface
         return (parent::install()
             && $this->registerHook(self::AVAILABLE_HOOKS)
             && Configuration::updateValue('MYMODULE_NAME', 'my friend')
+            && $this->installSql()
+            && $this->installTab()
         );
+    }
+
+    private function uninstallSql(): bool
+    {
+        $sql = "DROP TABLE IF EXISTS " . _DB_PREFIX_ . "testcomment";
+        return Db::getInstance()->execute($sql);
+    }
+
+    public function uninstallTab(): bool
+    {
+        $tabRepository = $this->get('prestashop.core.admin.tab.repository');
+        $tabId = $tabRepository->findOneIdByClassName('AdminTest');
+
+        if ($tabId) {
+            $tab = new Tab($tabId);
+            try {
+                $tab->delete();
+            } catch (Exception $e) {
+                echo $e->getMessage();
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -90,6 +153,8 @@ class MyModule extends Module implements WidgetInterface
     {
         return (parent::uninstall()
             && Configuration::deleteByName('MYMODULE_NAME')
+            && $this->uninstallSql()
+            && $this->uninstallTab()
         );
     }
 
