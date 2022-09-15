@@ -145,6 +145,10 @@ class MyModule extends Module implements WidgetInterface
      */
     public function getContent(): string
     {
+        /* 
+         * First method using the helper
+         */
+
         $output = '';
 
         // this part is executed only when the form is submitted
@@ -164,6 +168,24 @@ class MyModule extends Module implements WidgetInterface
         }
 
         return $output . $this->displayConfigurationForm();
+
+        /* 
+         * Second method using the tpl
+         */
+        // $message = null;
+
+        // if (Tools::getValue('courserating')) {
+        //     Configuration::updateValue('COURSE_RATING', Tools::getValue('courserating'));
+        //     $message = $this->trans("Form saved correctly");
+        // }
+
+        // $courserating = Configuration::get('COURSE_RATING');
+        // $this->context->smarty->assign([
+        //     'courserating' => $courserating,
+        //     'message' => $message
+        // ]);
+
+        // return $this->fetch('module:' . $this->name . '/views/templates/admin/configuration.tpl');
     }
 
     public function hookDisplayBanner(array $params)
