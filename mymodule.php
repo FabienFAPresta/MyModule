@@ -41,7 +41,8 @@ class MyModule extends Module implements WidgetInterface
         'actionFrontControllerSetMedia',
         'displayBanner',
         'displayFooter',
-        'displayDashboardToolbarIcons'
+        'displayDashboardToolbarIcons',
+        'moduleRoutes'
     ];
 
     private $container;
@@ -264,5 +265,21 @@ class MyModule extends Module implements WidgetInterface
         $this->context->smarty->assign($this->getWidgetVariables($hookName, $configuration));
 
         return $this->display(__FILE__, 'basic.tpl');
+    }
+
+    public function hookModuleRoutes(array $params): array
+    {
+        return [
+            'display' => [
+                'controller' => 'display',
+                'rule' => 'mymodule-display',
+                'keywords' => [],
+                'params' => [
+                    'module' => $this->name,
+                    'fc' => 'module',
+                    'controller' => 'display'
+                ]
+            ]
+        ];
     }
 }
