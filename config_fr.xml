@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <module>
     <name>mymodule</name>
-    <displayName><![CDATA[Mon module]]></displayName>
+    <displayName><![CDATA[My Module]]></displayName>
     <version><![CDATA[1.0.1]]></version>
-    <description><![CDATA[Regardez mon super module !]]></description>
+    <description><![CDATA[Description of My Module]]></description>
     <author><![CDATA[Fabien Fernandes Alves]]></author>
     <tab><![CDATA[front_office_features]]></tab>
 	<confirmUninstall><![CDATA[Are you sure you want to uninstall?]]></confirmUninstall>

@@ -25,17 +25,25 @@
  * @license   https://opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
  */
 
+use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
+
+require_once __DIR__ . '/src/TestService.php';
+//require_once __DIR__ . '/src/Repository/ProductRepository.php';
 
 class MyModule extends Module
 {
     public const AVAILABLE_HOOKS = [
         'actionFrontControllerSetMedia',
         'displayBanner',
+        'displayFooter',
         'displayDashboardToolbarIcons'
     ];
+
+    private $container;
 
     public function __construct()
     {
@@ -46,7 +54,7 @@ class MyModule extends Module
         $this->need_instance = 0;
         $this->ps_versions_compliancy = [
             'min' => '1.7.0.0',
-            'max' => '8.0.0.0',
+            'max' => _PS_VERSION_,
         ];
         $this->bootstrap = true;
 
@@ -55,7 +63,7 @@ class MyModule extends Module
         $this->displayName = $this->trans('My Module');
         $this->description = $this->trans('Description of My Module');
 
-        $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
+        $this->confirmUninstall = $this->trans('Are you sure you want to uninstall?');
     }
 
     /**
@@ -198,10 +206,26 @@ class MyModule extends Module
     public function hookDisplayDashboardToolbarIcons(array $hookParams): bool
     {
         if ($this->isSymfonyContext() && $hookParams['route'] === 'admin_product_catalog') {
-            $products = $this->get('product_repository')->findAllByLangId(1);
-            dump($products);
+            //$this->get('mymodule.testservice')->toto();
+            dump($this->container);
+            $container = SymfonyContainer::getInstance();
+            $container->get('mymodule.testservice');
+            dump($container);
+            //$products = $this->get('mymodule.product_repository')->findAllByLangId(1);
+            //dump($products);
+            dump($this->container);
         }
 
         return true;
+    }
+
+    public function hookDisplayFooter($params)
+    {
+        $this->context->smarty->assign([
+            'footer_sentence' => 'This is the footer !',
+            'cart_id' => $this->context->cart->id
+        ]);
+
+        return $this->display(__FILE__, 'footer.tpl');
     }
 }
