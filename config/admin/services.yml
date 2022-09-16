@@ -1,0 +1,8 @@
+services:
+  _defaults:
+    public: true
+
+  PrestaShop\Module\MyModule\Controller\Admin\AdminTestController:
+    class: PrestaShop\Module\MyModule\Controller\Admin\AdminTestController
+    arguments:
+      - "@doctrine.cache.provider"

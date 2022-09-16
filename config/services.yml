@@ -5,8 +5,12 @@ services:
   mymodule.testservice:
     class: PrestaShop\Module\MyModule\TestService
 
-  # mymodule.product_repository:
-  #   class: PrestaShop\Module\MyModule\Repository\ProductRepository
-  #   arguments:
-  #     $connection: "@doctrine.dbal.default_connection"
-  #     $databasePrefix: "%database_prefix%"
+  mymodule.product_repository:
+    class: PrestaShop\Module\MyModule\Repository\ProductRepository
+    arguments:
+      $connection: "@doctrine.dbal.default_connection"
+      $databasePrefix: "%database_prefix%"
+
+# Enables the serializer
+framework:
+  serializer: { enable_annotations: true }

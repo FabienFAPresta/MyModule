@@ -1,5 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
+//namespace PrestaShop\Module\MyModule\Controller\Front;
+
+// use ModuleFrontController;
+// use Tools;
+
 class MyModuleDisplayModuleFrontController extends ModuleFrontController
 {
     /**

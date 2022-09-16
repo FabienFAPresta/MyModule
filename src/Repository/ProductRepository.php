@@ -56,7 +56,7 @@ class ProductRepository
         $langTable = "${prefix}product_lang";
 
         $query = "SELECT p.* FROM ${table} AS p LEFT JOIN ${langTable} pl ON (p.`id_product` = pl.`id_product`)";
-        $query .= " WHERE pl.`id_product` = :langId";
+        $query .= " WHERE pl.`id_lang` = :langId";
         $statement = $this->connection->prepare($query);
         $statement->bindValue('langId', $langId);
         $res = $statement->executeQuery();
