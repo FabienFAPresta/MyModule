@@ -1,0 +1,7 @@
+mymodule_default_route:
+  path: mymodule/index
+  methods: [GET, POST]
+  defaults:
+    _controller: PrestaShop\Module\MyModule\Controller\Admin\AdminTestController::indexAction
+    _legacy_controller: "AdminTestController"
+    _legacy_link: "AdminTestController"

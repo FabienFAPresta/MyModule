@@ -28,13 +28,17 @@
 use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
 use PrestaShop\PrestaShop\Core\Module\WidgetInterface;
 use PrestaShopBundle\Entity\Repository\TabRepository;
+use Symfony\Component\HttpFoundation\Response;
 
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+if (file_exists(__DIR__ . '/vendor/autoload.php')) {
+    require_once __DIR__ . '/vendor/autoload.php';
+}
+
 require_once __DIR__ . '/src/TestService.php';
-//require_once __DIR__ . '/src/Repository/ProductRepository.php';
 
 class MyModule extends Module implements WidgetInterface
 {
@@ -84,7 +88,7 @@ class MyModule extends Module implements WidgetInterface
     public function installTab(): bool
     {
         $tab = new Tab();
-        $tab->class_name = 'AdminTest';
+        $tab->class_name = 'AdminTestController';
         $tab->module = $this->name;
         $tabRepository = $this->get('prestashop.core.admin.tab.repository');
         $tab->id_parent = $tabRepository->findOneIdByClassName('DEFAULT');
@@ -287,25 +291,47 @@ class MyModule extends Module implements WidgetInterface
     }
 
     /**
+     * Serialize products to xml and return the filename
+     *
+     * @param   array   $products           Products to serialize
+     * @return string                       Filename
+     */
+    private function serializeProducts(array $products): string
+    {
+        $productsXml = $this->get('serializer')->serialize(
+            $products,
+            'xml',
+            [
+                'xml_root_node_name' => 'products',
+                'xml_format_output' => true,
+            ]
+        );
+
+        $filename = _PS_UPLOAD_DIR_ . 'products.xml';
+
+        $this->get('filesystem')->dumpFile($filename, $productsXml);
+
+        return $filename;
+    }
+
+    /**
      * Add an "XML export" to the product list
      *
      * @param  array        $hookParams         Hook parameters
-     * @return bool
+     * @return string
      */
-    public function hookDisplayDashboardToolbarIcons(array $hookParams): bool
+    public function hookDisplayDashboardToolbarIcons(array $hookParams): string
     {
         if ($this->isSymfonyContext() && $hookParams['route'] === 'admin_product_catalog') {
-            //$this->get('mymodule.testservice')->toto();
-            dump($this->container);
-            $container = SymfonyContainer::getInstance();
-            $container->get('mymodule.testservice');
-            dump($container);
-            //$products = $this->get('mymodule.product_repository')->findAllByLangId(1);
-            //dump($products);
-            dump($this->container);
+            $products = $this->get('mymodule.product_repository')->findAllByLangId(1);
+            $filepath = $this->serializeProducts($products);
+
+            return $this->get('twig')->render('@Modules/' . $this->name . '/views/templates/hook/download_link.twig', [
+                'filepath' => _PS_BASE_URL_ . '/products.xml',
+            ]);
         }
 
-        return true;
+        return '';
     }
 
     public function hookDisplayFooter($params)

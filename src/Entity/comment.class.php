@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PrestaShop\Module\MyModule;
 
 use ObjectModel;
@@ -12,10 +14,10 @@ class CommentMyModule extends ObjectModel
 
     /** @var array   Fields definition */
     public static $definition = [
-        'table' => _DB_PREFIX_ . 'testcomment',
+        'table' => 'testcomment',
         'primary' => 'id',
-        'multilang' => true,
-        'multilang_shop' => true,
+        'multilang' => false,
+        'multilang_shop' => false,
         'fields' => [
             'user_id' => [
                 'type' => self::TYPE_INT,
